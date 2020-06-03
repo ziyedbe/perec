@@ -40,8 +40,10 @@ def version(binary):
 
 #Display the types available	
 def types(binary):
+	etypes=[]
 	for i in binary.resources_manager.types_available:
-		print(str(i).split(".")[1])
+		etypes.append(str(i).split(".")[1])
+	return etypes
 
 #Display infos about the icons and save them	
 def icons(binary):
@@ -62,13 +64,39 @@ def langue(binary):
 
 
 def iter(binary,arg):
+	etypes=types(binary)
+	if arg not in etypes:
+		print(format(binary.name)+" has no "+arg+". Abort!", file=sys.stderr)
+		sys.exit(1)
+	
+	if arg =="ICON":
+		icons(binary)
+
+	elif arg =="BITMAP":
+		print("BITMAP")
+		#TODO
+
+	elif arg =="CURSOR":
+		print("CURSOR")
+		#TODO
+
+	elif arg =="DIALOG":
+		dialogs(binary)
+
+	elif arg =="VERSION":
+		version(binary)
+		
+	elif arg =="MANIFEST":
+		manifest(binary)
+
+def out(binary,arg):
 	pass
 	#TODO
 
 def main(argv):
 
 	try:
-		opts, args = getopt.getopt(argv,"i:ats")
+		opts, args = getopt.getopt(argv,"i:ats:")
 	except getopt.GetoptError:
 		sys.exit(2)
 
@@ -83,7 +111,7 @@ def main(argv):
 			sys.exit()	
 
 		if opt == '-t':
-			types(binary)
+			print(types(binary))
 			sys.exit()	
 
 		if opt == '-s':
