@@ -1,6 +1,15 @@
 import sys, getopt
 import lief
 
+
+def usage():
+	print("-i <inputfile> : Input File")
+	print("-o <outputfile> : Output File")
+	print("-t : Display PE resources found")
+	print("-a : Display all PE resources")
+	print("-f : Display file infos")
+	print("""-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before, for icons -o is mandatory to save the icons""")
+	
 #Open the PE file and parse it using lief
 def open_pe(arg):
 	binary = lief.parse(arg)
@@ -82,7 +91,20 @@ def langue(binary):
 	 print(binary.resources_manager.langs_available)
 	 print(binary.resources_manager.sublangs_available)
 
+def File_Info(binary):
+	
+	print("\n\n ********fixed_file_info:********** \n\n")
+	print( binary.resources_manager.version.fixed_file_info)
+	print("file_flags : ", binary.resources_manager.version.fixed_file_info.file_flags)
+	print("file_flags_mask : ", binary.resources_manager.version.fixed_file_info.file_flags_mask)
+	print("file_subtype : ", binary.resources_manager.version.fixed_file_info.file_subtype)
+	print("\n\n ********string_file_info:********** \n\n")
+	print( binary.resources_manager.version.string_file_info)
+	print("\n\n ********var_file_info:********** \n\n")
+	print( binary.resources_manager.version.var_file_info)
 
+
+	
 def iter(binary,arg,found_o,output):
 	etypes=types(binary)
 	if arg not in etypes:
@@ -118,16 +140,24 @@ def output_help(found_o):
 
 def main(argv):
 	found_o=False
+	found_i=False
 	output=""
 	try:
-		opts, args = getopt.getopt(argv,"i:o:ats:")
+		opts, args = getopt.getopt(argv,"i:o:ats:grfh")
 	except getopt.GetoptError:
 		sys.exit(2)
 
 	for opt, arg in opts:
 
+
+		if opt == '-h':
+			usage()
+			sys.exit()	
+
+
 		if opt == '-i':
 			binary = open_pe(arg)
+			found_i=True
 			path=arg
 
 		if opt == '-o':
@@ -144,8 +174,29 @@ def main(argv):
 
 		if opt == '-s':
 			iter(binary,arg,found_o,output)
+			sys.exit()
+
+			#This is used for testing
+		if opt == '-g':
+			print(bytes(binary.resources.childs[0].childs[0].childs[0].content))
 			sys.exit()	
 
+			#This is usef for testing
+		if opt == '-r':
+			print(binary.resources_manager)
+			sys.exit()	
+
+
+		if opt == '-f':
+			File_Info(binary)
+			sys.exit()	
+
+
+
+	if not found_i:
+		print ("-i Please specify an input file")
+		print(" use -h for help")
+		sys.exit()
 
 if __name__ == "__main__":
    main(sys.argv[1:])
