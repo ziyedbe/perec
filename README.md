@@ -16,12 +16,11 @@ Those are the supported features :
 - MENU
 ...
 
-~
 # Usage
--i <inputfile> : Input File
--o <outputfile> : Output File
--t : Display PE resources found
--a : Display all PE resources
--f : Display file infos
--s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before, for icons -o is mandatory to save the icons
+-i <inputfile> : Input File  
+-o <outputfile> : Output File  
+-t : Display PE resources found  
+-a : Display all PE resources  
+-f : Display file infos  
+-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before, for icons -o is mandatory to save the icons  
 
