@@ -3,8 +3,9 @@ import lief
 
 
 def usage():
+	print("python3 perec.p -i <inputfile> -o <outputDir>  [option]")
 	print("-i <inputfile> : Input File")
-	print("-o <outputfile> : Output File")
+	print("-o <outputDir> : Output Directory")
 	print("-t : Display PE resources found")
 	print("-a : Display all PE resources")
 	print("-f : Display file infos")

@@ -18,7 +18,7 @@ Those are the supported features :
 
 # Usage
 -i <inputfile> : Input File  
--o <outputfile> : Output File  
+-o <outputDir> : Output Directory  
 -t : Display PE resources found  
 -a : Display all PE resources  
 -f : Display file infos  
