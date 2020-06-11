@@ -1,9 +1,10 @@
 # Perec
-This project is part of the forensics class from EURECOM.
+This project is part of the forensics class from EURECOM.  
 [B1] Write a (preferably python) Linux command-line tools to parse, extract, and visualize PE resources.
 
 # Features & help
-Perec is able to extract and parse the PE resources using lief library.
+Perec uses lief library to extract PE resources or raw data to parse.
+
 Those are the supported features :
 - CURSOR : Save cursor files to directory
 - BITMAP : Save bitmap files to directory
@@ -17,11 +18,12 @@ Those are the supported features :
 - MANIFEST : Display or Save manifest file to directory
 
 # Usage
--i <inputfile> : Input File
--o <outputDir> : Output Directory
--t : Display PE resources found
--a : Display all PE resources
--f : Display file infos
--s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before
-Example : python3 perec.py -i <inputfile> -o <outputDir> -s MANIFEST
+python3 perec.p -i <inputfile> -o <outputDir>  [option]  
+-i <inputfile> : Input File  
+-o <outputDir> : Output Directory  
+-t : Display PE resources found  
+-a : Display all PE resources supported by lief resources manager  
+-f : Display file infos  
+-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before  
+
 
