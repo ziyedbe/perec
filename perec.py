@@ -8,10 +8,25 @@ def usage():
 	print("-i <inputfile> : Input File")
 	print("-o <outputDir> : Output Directory")
 	print("-t : Display PE resources found")
-	print("-a : Display all PE resources")
+	print("-a : Display all PE resources supported by lief resources manager")
 	print("-f : Display file infos")
-	print("""-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before, for icons -o is mandatory to save the icons""")
-	
+	print("""-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before""")
+	print("Example : python3 perec.py -i <inputfile> -o <outputDir> -s MANIFEST")
+	print("---------------------------------------------")
+	print("-------------Supported Resources-------------")
+	print("\tCURSOR : Save cursor files to directory") #Parsed from raw data
+	print("\tBITMAP : Save bitmap files to directory") #Parsed from raw data
+	print("\tICON : Display information and save icon files to directory") # Used lief resources manager
+	print("\tMENU : Display or Save menu files to directory") #Parsed from raw data
+	print("\tDIALOG : Display or Save dialog files to directory") # Used lief resources manager
+	print("\tSTRING : Display or Save string files to directory") #Parsed from raw data
+	print("\tRCDATA : Save rcdata files to directory") #Parsed from raw data
+	print("\tMESSAGETABLE : Display or Save messagetable files to directory") #Parsed from raw data
+	print("\tVERSION : Display or Save version files to directory") # Used lief resources manager
+	print("\tMANIFEST : Display or Save manifest file to directory") # Used lief resources manager
+
+
+
 #Open the PE file and parse it using lief
 def open_pe(arg):
 	binary = lief.parse(arg)
@@ -165,10 +180,12 @@ def rcdata(binary,found_o,output):
 
 def group_icon(binary):
 	idd=fetch_ID(binary,"GROUP_ICON")
+	z=0
 	for i in binary.resources.childs[idd].childs:
 		for j in i.childs:
+			print("----------GROUP_ICON-"+str(z)+"------------------")
 			print(bytes(j.content))
-			print("---------------------------------------")
+			z+=1
 			#RAW data extracted, need for parsing later
 
 
@@ -190,10 +207,9 @@ def sstring(binary,found_o,output) :
 			z+=1
 	if not found_o:
 		print("*************perec message**************")
-		print("To save file please use")
+		print("To save files please use")
 		print("python3 perec.py -i <inputfile> -o <outputDir> -s STRING")
 			
-			#RAW data extracted, need for parsing later
 
 def group_cursor(binary):
 	idd=fetch_ID(binary,"GROUP_CURSOR")
@@ -203,26 +219,34 @@ def group_cursor(binary):
 			print("---------------------------------------")
 			#RAW data extracted, need for parsing later
 
-def messagetable(binary):
+def messagetable(binary,found_o,output):
 	idd=fetch_ID(binary,"MESSAGETABLE")
+	z=0
 	for i in binary.resources.childs[idd].childs:
 		for j in range(len(i.childs)):
-			print("---------------MESSAGETABLE-"+str(j)+"--------------")
+			
 			ch = i.childs[j].content
 			final = "".join(chr(x) for x in ch if chr(x) in string.printable)
-			print(final)
+			if found_o:
+				with open(output+binary.name+"_messagetable_"+str(z)+'.txt', 'w') as fout:
+					fout.write(final)
+				print("String file saved under "+output+binary.name+"_messagetable_"+str(z)+'.txt')
+			else:
+				print("-------------Messagetable-"+str(z)+"-------------------------")
+				print(final)
+			z+=1
 			
 
 def insert_dash(string, index):
     string=string[:index] + ' -- ' + string[index:]
     return string
 
-def menu(binary):
+def menu(binary,found_o,output):
 	idd=fetch_ID(binary,"MENU")
+	z=0
 	for i in binary.resources.childs[idd].childs:
 		for j in i.childs:
 			ch=bytes(j.content)
-			print("-----------------MENU----------------------")
 			final = "".join(chr(x) for x in ch if chr(x) in string.printable)
 			l=0
 			while(l<len(final)) :
@@ -231,7 +255,14 @@ def menu(binary):
 					l=l+4
 				l=l+1
 
-			print(final)
+			if found_o:
+				with open(output+binary.name+"_Menu_"+str(z)+'.txt', 'w') as fout:
+					fout.write(final)
+				print("String file saved under "+output+binary.name+"_Menu_"+str(z)+'.txt')
+			else:
+				print("-------------Menu-"+str(z)+"-------------------------")
+				print(final)
+			z+=1
 
 def iter(binary,arg,found_o,output):
 	etypes=types(binary)
@@ -248,34 +279,34 @@ def iter(binary,arg,found_o,output):
 		bitmap(binary,found_o,output) # Need few fixes
 
 	elif arg =="MENU":
-		menu(binary) # Need few fixes
+		menu(binary,found_o,output) # Need few fixes
 
 	elif arg =="CURSOR":
 		cursor(binary,found_o,output) # Need few fixes
 
 	elif arg =="RCDATA":
-		rcdata(binary,found_o,output) # Need few fixes
+		rcdata(binary,found_o,output) # Done
 
 	elif arg =="GROUP_ICON":
-		group_icon(binary) # This will be ignored, but it will be possible to see raw data only
+		group_icon(binary) # This will be ignored, but it will be possible to see raw data only for now
 
 	elif arg =="STRING":
-		sstring(binary,found_o,output) 
+		sstring(binary,found_o,output) # Done
 
 	elif arg =="GROUP_CURSOR":
-		group_cursor(binary) # This will be ignored, but it will be possible to see raw data only
+		group_cursor(binary) # This will be ignored, but it will be possible to see raw data only for now
 
 	elif arg =="MESSAGETABLE":
-		messagetable(binary)
+		messagetable(binary,found_o,output) # Done
 		
 	elif arg =="DIALOG":
-		dialogs(binary,found_o,output)
+		dialogs(binary,found_o,output) # Done
 
 	elif arg =="VERSION":
-		version(binary,found_o,output)
+		version(binary,found_o,output) # Done
 
 	elif arg =="MANIFEST":
-		manifest(binary,found_o,output)
+		manifest(binary,found_o,output) # Done
 
 
 #Print output message
