@@ -1,6 +1,6 @@
 import sys, getopt
 import lief
-
+import string
 
 def usage():
 	print("python3 perec.p -i <inputfile> -o <outputDir>  [option]")
@@ -104,25 +104,89 @@ def File_Info(binary):
 	print("\n\n ********var_file_info:********** \n\n")
 	print( binary.resources_manager.version.var_file_info)
 
+def cursor(binary):
+	idd=fetch_ID(binary,"CURSOR")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			print(bytes(j.content))
+			print("---------------------------------------")
+			#RAW data extracted, need for parsing later
 
-	
+def bitmap(binary):
+	idd=fetch_ID(binary,"BITMAP")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			print(bytes(j.content))
+			print("---------------------------------------")
+			#RAW data extracted, need for parsing later
+
+
+def group_icon(binary):
+	idd=fetch_ID(binary,"GROUP_ICON")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			print(bytes(j.content))
+			print("---------------------------------------")
+			#RAW data extracted, need for parsing later
+
+
+def sstring(binary):
+	idd=fetch_ID(binary,"STRING")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			print(bytes(j.content))
+			print("---------------------------------------")
+			#RAW data extracted, need for parsing later
+
+def group_cursor(binary):
+	idd=fetch_ID(binary,"GROUP_CURSOR")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			print(bytes(j.content))
+			print("---------------------------------------")
+			#RAW data extracted, need for parsing later
+
+def messagetable(binary):
+	idd=fetch_ID(binary,"MESSAGETABLE")
+	for i in binary.resources.childs[idd].childs:
+		for j in range(len(i.childs)):
+			print("---------------MESSAGETABLE-"+str(j)+"--------------")
+			ch = i.childs[j].content
+			final = "".join(chr(x) for x in ch if chr(x) in string.printable)
+			print(final)
+			
+
 def iter(binary,arg,found_o,output):
 	etypes=types(binary)
 	if arg not in etypes:
 		print(format(binary.name)+" has no "+arg+". Abort!", file=sys.stderr)
+		print("Please choose from the list below")
+		print(types(binary))
 		sys.exit(1)
 	
 	if arg =="ICON":
-		icons(binary,found_o,output)
+		icons(binary,found_o,output) # Done
 
 	elif arg =="BITMAP":
-		print("BITMAP")
+		bitmap(binary)    # This needs parsing, only raw data is extracted
 		#TODO
 
 	elif arg =="CURSOR":
-		print("CURSOR")
-		#TODO
+		cursor(binary) # This needs parsing, only raw data is extracted
 
+
+	elif arg =="GROUP_ICON":
+		group_icon(binary) # This needs parsing, only raw data is extracted
+
+	elif arg =="STRING":
+		sstring(binary) # This needs parsing, only raw data is extracted	
+
+	elif arg =="GROUP_CURSOR":
+		group_cursor(binary) # This needs parsing, only raw data is extracted	
+
+	elif arg =="MESSAGETABLE":
+		messagetable(binary)
+		
 	elif arg =="DIALOG":
 		dialogs(binary,found_o,output)
 
@@ -138,6 +202,18 @@ def output_help(found_o):
 	if not found_o:
 		print("use -o path/ to save files")
 
+
+
+def fetch_ID(binary,arg):
+	d = {"CURSOR":1,"BITMAP":2,"ICON":3,"DIALOG":5,"STRING":6,
+	"MESSAGETABLE":11,"GROUP_CURSOR":12,"GROUP_ICON":14,
+	"VERSION":16,"MANIFEST":24}
+	s=binary.resources.childs
+	j=0
+	for i in s:
+		if i.id == d[arg]:
+			return j
+		j+=1
 
 def main(argv):
 	found_o=False
@@ -179,10 +255,14 @@ def main(argv):
 
 			#This is used for testing
 		if opt == '-g':
-			print(bytes(binary.resources.childs[0].childs[0].childs[0].content))
-			sys.exit()	
+			#print((binary.resources.childs[5].childs[0].childs[0].content))
+			idd = fetch_ID(binary,"GROUP_CURSOR")
 
-			#This is usef for testing
+			s = binary.resources.childs[idd]
+			print(s.childs[0].childs[0].content)
+			
+
+			#This is used for testing
 		if opt == '-r':
 			print(binary.resources_manager)
 			sys.exit()	
