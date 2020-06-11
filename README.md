@@ -18,6 +18,7 @@ Those are the supported features :
 - MANIFEST : Display or Save manifest file to directory
 
 # Usage
+```
 python3 perec.p -i <inputfile> -o <outputDir>  [option]  
 -i <inputfile> : Input File  
 -o <outputDir> : Output Directory  
@@ -25,5 +26,5 @@ python3 perec.p -i <inputfile> -o <outputDir>  [option]
 -a : Display all PE resources supported by lief resources manager  
 -f : Display file infos  
 -s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before  
-
+```
 
