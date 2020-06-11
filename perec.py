@@ -1,6 +1,7 @@
 import sys, getopt
 import lief
 import string
+import binascii
 
 def usage():
 	print("python3 perec.p -i <inputfile> -o <outputDir>  [option]")
@@ -112,12 +113,27 @@ def cursor(binary):
 			print("---------------------------------------")
 			#RAW data extracted, need for parsing later
 
-def bitmap(binary):
+def bitmap(binary,found_o,output):
 	idd=fetch_ID(binary,"BITMAP")
+	z=0
+	if not found_o:
+		print("Please specify an output folder to save the bitmap files")
+		print("Example : python3 perec.py -i FileZilla.exe -o out/ -s BITMAP")
 	for i in binary.resources.childs[idd].childs:
+		
 		for j in i.childs:
-			print(bytes(j.content))
-			print("---------------------------------------")
+			hexstr="".join("%02x" % k for k in j.content)
+			magic = "424d"
+			header = "740600000000000072000000"
+			hexstr=magic+header+hexstr
+			
+			if found_o:
+				with open(output+binary.name+"_"+str(z)+'.bmp', 'wb') as fout:
+					fout.write(binascii.unhexlify(hexstr))
+					print("Bitmap saved under :"+output+binary.name+"_"+str(z)+'.bmp')
+					z+=1
+			
+			
 			#RAW data extracted, need for parsing later
 
 
@@ -168,7 +184,7 @@ def iter(binary,arg,found_o,output):
 		icons(binary,found_o,output) # Done
 
 	elif arg =="BITMAP":
-		bitmap(binary)    # This needs parsing, only raw data is extracted
+		bitmap(binary,found_o,output)    # This needs parsing, only raw data is extracted
 		#TODO
 
 	elif arg =="CURSOR":
