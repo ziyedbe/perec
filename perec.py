@@ -11,7 +11,7 @@ def usage():
 	print("-a : Display all PE resources supported by lief resources manager")
 	print("-f : Display file infos")
 	print("""-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before""")
-	print("Example : python3 perec.py -i <inputfile> -o <outputDir> -s MANIFEST")
+
 	print("---------------------------------------------")
 	print("-------------Supported Resources-------------")
 	print("\tCURSOR : Save cursor files to directory") #Parsed from raw data
