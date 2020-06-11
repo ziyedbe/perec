@@ -105,12 +105,23 @@ def File_Info(binary):
 	print("\n\n ********var_file_info:********** \n\n")
 	print( binary.resources_manager.version.var_file_info)
 
-def cursor(binary):
+def cursor(binary,found_o,output):
 	idd=fetch_ID(binary,"CURSOR")
+	z=0
+	if not found_o:
+		print("Please specify an output folder to save the bitmap files")
+		print("Example : python3 perec.py -i FileZilla.exe -o out/ -s CURSOR")
 	for i in binary.resources.childs[idd].childs:
 		for j in i.childs:
-			print(bytes(j.content))
-			print("---------------------------------------")
+			hexstr="".join("%02x" % k for k in j.content)
+			
+			hexstr="00000200010020200000"+hexstr[:8]+"3401000016000000"+hexstr[8::] # should be generalized
+			hexstr=hexstr+"0"*(346*2-len(hexstr)) # should be generalized
+			if found_o:
+				with open(output+binary.name+"_"+str(z)+'.cur', 'wb') as fout:
+					fout.write(binascii.unhexlify(hexstr))
+					print("Cursor saved under :"+output+binary.name+"_"+str(z)+'.cur')
+					z+=1
 			#RAW data extracted, need for parsing later
 
 def bitmap(binary,found_o,output):
@@ -134,7 +145,6 @@ def bitmap(binary,found_o,output):
 					z+=1
 			
 			
-			#RAW data extracted, need for parsing later
 
 
 def group_icon(binary):
@@ -146,12 +156,27 @@ def group_icon(binary):
 			#RAW data extracted, need for parsing later
 
 
-def sstring(binary):
+def sstring(binary,found_o,output) :
 	idd=fetch_ID(binary,"STRING")
+	z=0
 	for i in binary.resources.childs[idd].childs:
 		for j in i.childs:
-			print(bytes(j.content))
-			print("---------------------------------------")
+			
+			ch = j.content
+			final = "".join(chr(x) for x in ch if chr(x) in string.printable)
+			if found_o:
+				with open(output+binary.name+"_string"+str(z)+'.txt', 'w') as fout:
+					fout.write(final)
+				print("String file saved under "+output+binary.name+"_string"+str(z)+'.txt')
+			else:
+				print("-------------String-"+str(z)+"-------------------------")
+				print(final)
+			z+=1
+	if not found_o:
+		print("*************perec message**************")
+		print("To save file please use")
+		print("python3 perec.py -i <inputfile> -o <outputDir> -s STRING")
+			
 			#RAW data extracted, need for parsing later
 
 def group_cursor(binary):
@@ -172,6 +197,26 @@ def messagetable(binary):
 			print(final)
 			
 
+def insert_dash(string, index):
+    string=string[:index] + ' -- ' + string[index:]
+    return string
+
+def menu(binary):
+	idd=fetch_ID(binary,"MENU")
+	for i in binary.resources.childs[idd].childs:
+		for j in i.childs:
+			ch=bytes(j.content)
+			print("-----------------MENU----------------------")
+			final = "".join(chr(x) for x in ch if chr(x) in string.printable)
+			l=0
+			while(l<len(final)) :
+				if final[l].isupper():
+					final=insert_dash(final,l)
+					l=l+4
+				l=l+1
+
+			print(final)
+
 def iter(binary,arg,found_o,output):
 	etypes=types(binary)
 	if arg not in etypes:
@@ -184,18 +229,20 @@ def iter(binary,arg,found_o,output):
 		icons(binary,found_o,output) # Done
 
 	elif arg =="BITMAP":
-		bitmap(binary,found_o,output)    # This needs parsing, only raw data is extracted
-		#TODO
+		bitmap(binary,found_o,output) 
+
+	elif arg =="MENU":
+		menu(binary)
 
 	elif arg =="CURSOR":
-		cursor(binary) # This needs parsing, only raw data is extracted
+		cursor(binary,found_o,output) # This needs parsing, only raw data is extracted
 
 
 	elif arg =="GROUP_ICON":
 		group_icon(binary) # This needs parsing, only raw data is extracted
 
 	elif arg =="STRING":
-		sstring(binary) # This needs parsing, only raw data is extracted	
+		sstring(binary,found_o,output) 
 
 	elif arg =="GROUP_CURSOR":
 		group_cursor(binary) # This needs parsing, only raw data is extracted	
@@ -221,9 +268,9 @@ def output_help(found_o):
 
 
 def fetch_ID(binary,arg):
-	d = {"CURSOR":1,"BITMAP":2,"ICON":3,"DIALOG":5,"STRING":6,
-	"MESSAGETABLE":11,"GROUP_CURSOR":12,"GROUP_ICON":14,
-	"VERSION":16,"MANIFEST":24}
+	d = {"CURSOR":1,"BITMAP":2,"ICON":3,"MENU":4,"DIALOG":5,
+	"STRING":6,"MESSAGETABLE":11,"GROUP_CURSOR":12,
+	"GROUP_ICON":14,"VERSION":16,"MANIFEST":24}
 	s=binary.resources.childs
 	j=0
 	for i in s:
