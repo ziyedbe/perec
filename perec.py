@@ -109,7 +109,7 @@ def cursor(binary,found_o,output):
 	idd=fetch_ID(binary,"CURSOR")
 	z=0
 	if not found_o:
-		print("Please specify an output folder to save the bitmap files")
+		print("Please specify an output folder to save the cursor files")
 		print("Example : python3 perec.py -i FileZilla.exe -o out/ -s CURSOR")
 	for i in binary.resources.childs[idd].childs:
 		for j in i.childs:
@@ -145,7 +145,23 @@ def bitmap(binary,found_o,output):
 					z+=1
 			
 			
-
+def rcdata(binary,found_o,output):
+	idd=fetch_ID(binary,"RCDATA")
+	z=0
+	if not found_o:
+		print("Please specify an output folder to save the rcdata files")
+		print("Example : python3 perec.py -i FileZilla.exe -o out/ -s RCDATA")
+		sys.exit()	
+	for i in binary.resources.childs[idd].childs:
+		for j in range(len(i.childs)):
+			ch = i.childs[j].content
+			
+			hexstr="".join("%02x" % k for k in ch)
+			if found_o:
+				with open(output+binary.name+"_rcdata_"+str(z), 'wb') as fout:
+					fout.write(binascii.unhexlify(hexstr))
+					print("File saved under :"+output+binary.name+"_rcdata_"+str(z))
+			z+=1
 
 def group_icon(binary):
 	idd=fetch_ID(binary,"GROUP_ICON")
@@ -229,23 +245,25 @@ def iter(binary,arg,found_o,output):
 		icons(binary,found_o,output) # Done
 
 	elif arg =="BITMAP":
-		bitmap(binary,found_o,output) 
+		bitmap(binary,found_o,output) # Need few fixes
 
 	elif arg =="MENU":
-		menu(binary)
+		menu(binary) # Need few fixes
 
 	elif arg =="CURSOR":
-		cursor(binary,found_o,output) # This needs parsing, only raw data is extracted
+		cursor(binary,found_o,output) # Need few fixes
 
+	elif arg =="RCDATA":
+		rcdata(binary,found_o,output) # Need few fixes
 
 	elif arg =="GROUP_ICON":
-		group_icon(binary) # This needs parsing, only raw data is extracted
+		group_icon(binary) # This will be ignored, but it will be possible to see raw data only
 
 	elif arg =="STRING":
 		sstring(binary,found_o,output) 
 
 	elif arg =="GROUP_CURSOR":
-		group_cursor(binary) # This needs parsing, only raw data is extracted	
+		group_cursor(binary) # This will be ignored, but it will be possible to see raw data only
 
 	elif arg =="MESSAGETABLE":
 		messagetable(binary)
@@ -269,7 +287,8 @@ def output_help(found_o):
 
 def fetch_ID(binary,arg):
 	d = {"CURSOR":1,"BITMAP":2,"ICON":3,"MENU":4,"DIALOG":5,
-	"STRING":6,"MESSAGETABLE":11,"GROUP_CURSOR":12,
+	"STRING":6,"ACCELERATOR":9,"RCDATA":10,
+	"MESSAGETABLE":11,"GROUP_CURSOR":12,
 	"GROUP_ICON":14,"VERSION":16,"MANIFEST":24}
 	s=binary.resources.childs
 	j=0
