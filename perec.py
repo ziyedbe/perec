@@ -7,10 +7,11 @@ def usage():
 	print("python3 perec.p -i <inputfile> -o <outputDir>  [option]")
 	print("-i <inputfile> : Input File")
 	print("-o <outputDir> : Output Directory")
-	print("-t : Display PE resources found")
-	print("-a : Display all PE resources supported by lief resources manager")
+	print("-t : Display PE resources names found")
+	print("-r : Display all PE resources supported by lief resources manager")
 	print("-f : Display file infos")
-	print("""-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before""")
+	print("""-s <RESOURCE>: Display PE resource with the possibility to save it if -o was used before""")
+	print("-a : Display or save all PE resources available (from lief + the parsed PE resources)")
 
 	print("---------------------------------------------")
 	print("-------------Supported Resources-------------")
@@ -264,6 +265,11 @@ def menu(binary,found_o,output):
 				print(final)
 			z+=1
 
+def getall(binary,found_o,output):
+	typ = types(binary)
+	for i in typ:
+		iter(binary,i,found_o,output)
+
 def iter(binary,arg,found_o,output):
 	etypes=types(binary)
 	if arg not in etypes:
@@ -354,7 +360,7 @@ def main(argv):
 			found_o= True
 			output=arg+"/"
 
-		if opt == '-a':
+		if opt == '-r':
 			resmanager(binary)
 			sys.exit()	
 
@@ -376,8 +382,8 @@ def main(argv):
 			
 
 			#This is used for testing
-		if opt == '-r':
-			print(binary.resources_manager)
+		if opt == '-a':
+			getall(binary,found_o,output)
 			sys.exit()	
 
 

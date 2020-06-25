@@ -17,13 +17,29 @@ Those are the supported features :
 - VERSION : Display or Save version files to directory
 - MANIFEST : Display or Save manifest file to directory
 
+# Supported by lief
+- ICON
+- DIALOG
+- VERSION
+- MANIFEST
+
+# Parsed from raw data
+- CURSOR
+- BITMAP
+- MENU
+- STRING
+- RCDATA
+- MESSAGETABLE
+- 
 # Usage
+```
 python3 perec.p -i <inputfile> -o <outputDir>  [option]  
 -i <inputfile> : Input File  
 -o <outputDir> : Output Directory  
 -t : Display PE resources found  
--a : Display all PE resources supported by lief resources manager  
+-r : Display all PE resources supported by lief resources manager  
 -f : Display file infos  
--s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before  
-
+-s <Resource>: Display PE resource with the possibility to save it if -o was used before  
+-a : Display or save all PE resources available (from lief + the parsed PE resources)
+```
 
