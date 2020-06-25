@@ -38,8 +38,9 @@ python3 perec.p -i <inputfile> -o <outputDir>  [option]
 -i <inputfile> : Input File  
 -o <outputDir> : Output Directory  
 -t : Display PE resources found  
--a : Display all PE resources supported by lief resources manager  
+-r : Display all PE resources supported by lief resources manager  
 -f : Display file infos  
--s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before  
+-s <ICON/DIALOG/VERSION/MANIFEST>: Display PE resource with the possibility to save it if -o was used before 
+-a : Display or save all PE resources available (from lief + the parsed PE resources) 
 ```
 
